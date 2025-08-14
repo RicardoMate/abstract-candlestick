@@ -17,3 +17,5 @@ function openSocial(platform) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🌐 Social functions loaded');
 });
+
+

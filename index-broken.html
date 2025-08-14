@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candlestick Platformer - Jump on Candlesticks!</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Play the exciting Candlestick Platformer game! Jump on candlesticks to create new ones and achieve high scores. A fun trading-themed platformer game.">
+    <meta name="keywords" content="game, platformer, candlestick, trading, crypto, browser game, free game">
+    <meta name="author" content="Candlestick Platformer">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Candlestick Platformer">
+    <meta property="og:description" content="Jump on candlesticks to create new ones! A fun trading-themed platformer game.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/candlestick-platformer">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Candlestick Platformer">
+    <meta name="twitter:description" content="Jump on candlesticks to create new ones! A fun trading-themed platformer game.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.1" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .loading-text {
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .loading-instructions {
+            text-align: center;
+            line-height: 1.5;
+            opacity: 0.7;
+        }
+
+        .loading-numbers {
+            position: absolute;
+            bottom: 2rem;
+            font-family: monospace;
+            opacity: 0.3;
+        }
+        
+        .loading-bar-container {
+            width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 2rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049, #66BB6A);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .loading-percentage {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-top: 1rem;
+            opacity: 0.8;
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: 2px solid #2E7D32;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .start-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
+            border-color: #388E3C;
+        }
+        
+        .start-button.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+
+
+        .main-content {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            padding: 2rem;
+        }
+
+        .hero {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .title {
+            font-size: 6rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .more-details {
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        .back-button, .social-buttons, .menu-button, .close-button {
+            position: absolute;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .back-button:hover, .social-buttons:hover, .menu-button:hover, .close-button:hover {
+            opacity: 1;
+        }
+
+        .back-button {
+            top: 2rem;
+            left: 2rem;
+        }
+
+        .social-buttons {
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .telegram-button, .twitter-button {
+            position: relative;
+            width: 100px;
+            height: 140px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .telegram-button:hover, .twitter-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            filter: brightness(1.2);
+        }
+        
+        .candlestick {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .wick-upper {
+            width: 4px;
+            height: 30px;
+            background: #666;
+            border-radius: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .candle-body {
+            width: 60px;
+            height: 70px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+        
+        .telegram-button .candle-body {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border-color: #2E7D32;
+        }
+        
+        .twitter-button .candle-body {
+            background: linear-gradient(135deg, #EF5350, #F44336);
+            border-color: #C62828;
+        }
+        
+        .candle-body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 2px;
+        }
+        
+        .wick-lower {
+            width: 4px;
+            height: 24px;
+            background: #666;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        
+        .telegram-button span, .twitter-button span {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .menu-button {
+            bottom: 2rem;
+            right: 2rem;
+        }
+
+
+        
+
+
+        .profile {
+            position: absolute;
+            bottom: 8rem;
+            left: 2rem;
+            max-width: 300px;
+            opacity: 0.7;
+        }
+
+        .view-works {
+            margin-top: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 2rem;
+            z-index: 999;
+            display: none;
+        }
+
+        .close-settings {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            cursor: pointer;
+        }
+
+        .setting-group {
+            margin-bottom: 2rem;
+        }
+
+        .setting-group h3 {
+            margin-bottom: 1rem;
+        }
+
+        .setting-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .option {
+            padding: 0.5rem 1rem;
+            border: 1px solid #fff;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .option.active {
+            opacity: 1;
+            background: #fff;
+            color: #000;
+        }
+
+        .setting-actions {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action {
+            padding: 0.5rem 1rem;
+            border: 1px solid #fff;
+            cursor: pointer;
+        }
+
+        .action.error {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .action.ok {
+            border-color: #44ff44;
+            color: #44ff44;
+        }
+
+        #game-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            background: #00FF66; /* Verde vibrante exacto de la imagen */
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.2s ease;
+            cursor: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            clip-path: polygon(50% 0%, 100% 25%, 75% 50%, 100% 75%, 50% 100%, 0% 75%, 25% 50%, 0% 25%);
+            transform: rotate(0deg);
+            transition: all 0.2s ease;
+        }
+        
+        .custom-cursor::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #00FF66;
+            clip-path: polygon(50% 0%, 75% 25%, 50% 50%, 75% 75%, 50% 100%, 25% 75%, 50% 50%, 25% 25%);
+            transform: rotate(0deg);
+            transition: all 0.2s ease;
+        }
+        
+        .custom-cursor:hover::before {
+            transform: rotate(120deg) scale(1.1);
+        }
+        
+        .custom-cursor:hover::after {
+            transform: rotate(120deg) scale(1.1);
+        }
+        
+        .custom-cursor:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.8));
+        }
+
+        .controls-info {
+            display: none; /* Hidden to avoid overlap with game UI */
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-text">Candlestick Platformer</div>
+                       <div class="loading-instructions">
+                   <div>WASD or Arrow Keys to move</div>
+                   <div>SPACE to jump</div>
+                   <div>Jump on candlesticks to create new ones!</div>
+                   <div>Don't fall into the lava!</div>
+                   <div style="color: #9C27B0; margin-top: 1rem;">
+                       🎵 MP3 MUSIC: M (toggle), [ (vol-), ] (vol+)
+                   </div>
+               </div>
+        
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        
+        <div class="loading-percentage">0%</div>
+        
+        <button class="start-button">START JUMPING</button>
+        
+        <div class="loading-numbers">
+            <div>901234567890901234567890</div>
+            <div>901234567890901234567890</div>
+        </div>
+    </div>
+
+             <main class="main-content">
+        <div class="info-panel" style="position: fixed; bottom: 120px; right: 20px; z-index: 1000; text-align: right; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; max-width: 300px;">
+            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Candlestick Platformer</h2>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">jump to create new candlesticks!</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">back</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Telegram & Twitter</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">menu</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Pattern: Bullish/Bearish</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Welcome to the exciting world of candlestick jumping! Jump on candlesticks to automatically create new ones.</p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">start jumping!</p>
+        </div>
+
+        <div class="back-button">
+            <span>back</span>
+        </div>
+
+        <div class="social-buttons">
+            <div class="telegram-button">
+                <div class="candlestick">
+                    <div class="wick-upper"></div>
+                    <div class="candle-body"></div>
+                    <div class="wick-lower"></div>
+                </div>
+                <span>Telegram</span>
+            </div>
+            <div class="twitter-button">
+                <div class="candlestick">
+                    <div class="wick-upper"></div>
+                    <div class="candle-body"></div>
+                    <div class="wick-lower"></div>
+                </div>
+                <span>Twitter</span>
+            </div>
+        </div>
+        
+
+
+        <div class="menu-button">
+            <span>menu</span>
+        </div>
+
+
+
+        <div class="settings-panel">
+            <h2>settings</h2>
+            <div class="close-settings">
+                <span>close</span>
+            </div>
+
+            <div class="setting-group">
+                <h3>display mode</h3>
+                <div class="setting-options">
+                    <div class="option active">full</div>
+                    <div class="option">simple</div>
+                    <div class="option">minimum</div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>menu position</h3>
+                <div class="setting-options">
+                    <div class="option active">bottom<br>- right</div>
+                    <div class="option">bottom<br>- left</div>
+                    <div class="option">top -<br>right</div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>color scheme</h3>
+                <div class="setting-subgroup">
+                    <h4>auto light / dark mode</h4>
+                    <p>whether to depend on the OS setting.</p>
+                    <div class="setting-options">
+                        <div class="option">off</div>
+                        <div class="option active">on</div>
+                    </div>
+                </div>
+                <div class="setting-subgroup">
+                    <h4>light / dark mode</h4>
+                    <p>if "auto light / dark mode" setting is off, you can select color scheme.</p>
+                    <div class="setting-options">
+                        <div class="option">light</div>
+                        <div class="option active">dark</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-actions">
+                <div class="action error">error</div>
+                <div class="action ok">ok</div>
+            </div>
+        </div>
+    </main>
+
+    <canvas id="game-canvas"></canvas>
+    <div class="custom-cursor"></div>
+    <div class="controls-info">
+        WASD/Arrows: Move | SPACE: Jump | Click: Add Candlesticks
+    </div>
+
+
+
+    <script>
+        // Candlestick Platformer - 2D Game with Cartoon Candlesticks
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+                 // Audio System - Simple MP3 Player
+         let audioContext;
+         let musicAudio;
+         let musicStarted = false;
+         let musicVolume = 0.5;
+        
+                 // Game state
+         let gameState = 'loading';
+         let candlesticks = [];
+         let player = {
+             x: 100,
+             y: 400,
+             width: 30,
+             height: 40,
+             vx: 0,
+             vy: 0,
+             onGround: false,
+             color: '#FF6B6B'
+         };
+         
+         let camera = {
+             x: 0,
+             y: 0
+         };
+         
+         let keys = {};
+         let gravity = 0.6; // Reduced gravity for better control
+         let jumpPower = -18; // Stronger jump
+         let moveSpeed = 3; // Slower movement for better precision
+         
+         // Game mechanics
+         let score = 0;
+         let gameOver = false;
+         let highestCandlestick = 0;
+         let trendStrength = 0; // For realistic market patterns
+         let gameOverTime = 0; // For popup animation
+         let scorePopup = null; // For score animation
+         
+         // Infinite pattern mechanics
+         let patternDirection = 'bullish'; // 'bullish' or 'bearish'
+         let patternHeight = 0; // Current height percentage (0-100)
+         let baseHeight = 0; // Base height for calculations
+         
+         // Restart protection
+         let restartCooldown = false;
+         
+         // Lava floor properties
+         let lavaFloor = {
+             y: 0,
+             height: 50,
+             color: '#FF4500',
+             glowColor: '#FF6347'
+         };
+         
+                  // Death particles for when player touches lava
+         let deathParticles = [];
+         
+         // High score system variables
+         let highScores = [];
+         let playerName = '';
+         let showHighScoreForm = false;
+         let isNewHighScore = false;
+         let currentHighScore = 0;
+         
+        
+        
+         
+         // Music Functions
+         function initAudio() {
+             try {
+                 // Create audio element for MP3
+                 musicAudio = new Audio();
+                 musicAudio.loop = true; // Loop the music
+                 musicAudio.volume = musicVolume;
+                 
+                 // Try to load default MP3 if it exists
+                 loadDefaultMP3();
+                 
+                 console.log('MP3 audio system initialized successfully');
+             } catch (error) {
+                 console.log('Audio not supported:', error);
+             }
+         }
+         
+         function loadDefaultMP3() {
+             // Try to load music.mp3 from the project folder
+             musicAudio.src = './music.mp3';
+             musicAudio.load();
+             
+             // Check if file exists
+             musicAudio.addEventListener('canplaythrough', () => {
+                 console.log('MP3 loaded successfully: music.mp3');
+                 // Auto-start music after a short delay
+                 setTimeout(() => {
+                     if (!musicStarted) {
+                         startMusic();
+                     }
+                 }, 1000);
+             });
+             
+             musicAudio.addEventListener('error', () => {
+                 console.log('MP3 not found: music.mp3');
+             });
+         }
+         
+         // MP3 Music System - Simple and Clean
+             
+             // Create oscillator for bass
+             const bassOsc = audioContext.createOscillator();
+             const bassGain = audioContext.createGain();
+             bassOsc.connect(bassGain);
+             bassGain.connect(musicGain);
+             
+             // Create oscillator for melody
+             const melodyOsc = audioContext.createOscillator();
+             const melodyGain = audioContext.createGain();
+             melodyOsc.connect(melodyGain);
+             melodyGain.connect(musicGain);
+             
+             // INTENSE ELECTRONIC BASS PATTERN (Dubstep style)
+             const bassPattern = [
+                 { note: 'C1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'C1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'F1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'G1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'C1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'C1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'F1', duration: 0.25, volume: 0.6, type: 'sawtooth' },
+                 { note: 'G1', duration: 0.25, volume: 0.6, type: 'sawtooth' }
+             ];
+             
+             // FAST LEAD MELODY (Trance style)
+             const melodyPattern = [
+                 { note: 'C4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'E4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'G4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'C5', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'D4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'F4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'A4', duration: 0.125, volume: 0.4, type: 'square' },
+                 { note: 'D5', duration: 0.125, volume: 0.4, type: 'square' }
+             ];
+             
+             let bassTime = 0;
+             let melodyTime = 0;
+             
+             // Play INTENSE BASS
+             bassPattern.forEach((pattern, index) => {
+                 setTimeout(() => {
+                     if (audioContext && musicStarted) {
+                         const osc = audioContext.createOscillator();
+                         const gain = audioContext.createGain();
+                         const filter = audioContext.createBiquadFilter();
+                         
+                         osc.type = pattern.type;
+                         osc.frequency.setValueAtTime(getNoteFrequency(pattern.note), audioContext.currentTime);
+                         
+                         // Add filter for electronic sound
+                         filter.type = 'lowpass';
+                         filter.frequency.setValueAtTime(200, audioContext.currentTime);
+                         filter.Q.setValueAtTime(8, audioContext.currentTime);
+                         
+                         gain.gain.setValueAtTime(pattern.volume, audioContext.currentTime);
+                         gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + pattern.duration);
+                         
+                         osc.connect(filter);
+                         filter.connect(gain);
+                         gain.connect(musicGain);
+                         
+                         osc.start(audioContext.currentTime);
+                         osc.stop(audioContext.currentTime + pattern.duration);
+                     }
+                 }, bassTime * 1000);
+                 bassTime += pattern.duration;
+             });
+             
+             // Play FAST LEAD
+             melodyPattern.forEach((pattern, index) => {
+                 setTimeout(() => {
+                     if (audioContext && musicStarted) {
+                         const osc = audioContext.createOscillator();
+                         const gain = audioContext.createGain();
+                         
+                         osc.type = pattern.type;
+                         osc.frequency.setValueAtTime(getNoteFrequency(pattern.note), audioContext.currentTime);
+                         gain.gain.setValueAtTime(pattern.volume, audioContext.currentTime);
+                         gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + pattern.duration);
+                         
+                         osc.connect(gain);
+                         gain.connect(musicGain);
+                         
+                         osc.start(audioContext.currentTime);
+                         osc.stop(audioContext.currentTime + pattern.duration);
+                     }
+                 }, melodyTime * 1000);
+                 melodyTime += pattern.duration;
+             });
+             
+             // Play DEEP SUB BASS (Deep electronic)
+             const subBassPattern = [
+                 { note: 'C0', duration: 0.5, volume: 0.3, type: 'sine' },
+                 { note: 'F0', duration: 0.5, volume: 0.3, type: 'sine' },
+                 { note: 'G0', duration: 0.5, volume: 0.3, type: 'sine' },
+                 { note: 'C0', duration: 0.5, volume: 0.3, type: 'sine' }
+             ];
+             
+             let subBassTime = 0;
+             subBassPattern.forEach((pattern, index) => {
+                 setTimeout(() => {
+                     if (audioContext && musicStarted) {
+                         const osc = audioContext.createOscillator();
+                         const gain = audioContext.createGain();
+                         
+                         osc.type = pattern.type;
+                         osc.frequency.setValueAtTime(getNoteFrequency(pattern.note), audioContext.currentTime);
+                         
+                         gain.gain.setValueAtTime(pattern.volume, audioContext.currentTime);
+                         gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + pattern.duration);
+                         
+                         osc.connect(gain);
+                         gain.connect(musicGain);
+                         
+                         osc.start(audioContext.currentTime);
+                         osc.stop(audioContext.currentTime + pattern.duration);
+                     }
+                 }, subBassTime * 1000);
+                 subBassTime += pattern.duration;
+             });
+             
+             // Play FAST ARPEGGIATOR (Electronic arpeggios)
+             const arpPattern = [
+                 { note: 'C3', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'E3', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'G3', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'C4', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'E3', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'G3', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'C4', duration: 0.0625, volume: 0.2, type: 'sawtooth' },
+                 { note: 'E4', duration: 0.0625, volume: 0.2, type: 'sawtooth' }
+             ];
+             
+             let arpTime = 0;
+             arpPattern.forEach((pattern, index) => {
+                 setTimeout(() => {
+                     if (audioContext && musicStarted) {
+                         const osc = audioContext.createOscillator();
+                         const gain = audioContext.createGain();
+                         
+                         osc.type = pattern.type;
+                         osc.frequency.setValueAtTime(getNoteFrequency(pattern.note), audioContext.currentTime);
+                         
+                         gain.gain.setValueAtTime(pattern.volume, audioContext.currentTime);
+                         gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + pattern.duration);
+                         
+                         osc.connect(gain);
+                         gain.connect(musicGain);
+                         
+                         osc.start(audioContext.currentTime);
+                         osc.stop(audioContext.currentTime + pattern.duration);
+                     }
+                 }, arpTime * 1000);
+                 arpTime += pattern.duration;
+             });
+             
+
+         
+         // MP3 Music System - Simple and Clean
+         
+         function startMusic() {
+             if (!musicStarted && musicAudio) {
+                 musicStarted = true;
+                 musicAudio.play().catch(e => console.log('Music play failed:', e));
+                 console.log('MP3 music started!');
+             }
+         }
+         
+         function stopMusic() {
+             musicStarted = false;
+             if (musicAudio) {
+                 musicAudio.pause();
+                 musicAudio.currentTime = 0;
+             }
+         }
+         
+         function setMusicVolume(volume) {
+             musicVolume = Math.max(0, Math.min(1, volume));
+             if (musicAudio) {
+                 musicAudio.volume = musicVolume;
+             }
+         }
+         
+
+         
+         // Initialize game
+         function init() {
+             // Prevent multiple initializations
+             if (gameState === 'restarting') {
+                 console.log('Game is restarting, please wait...');
+                 return;
+             }
+             
+             canvas.width = window.innerWidth;
+             canvas.height = window.innerHeight;
+             
+             // Initialize audio system
+             initAudio();
+             
+             // Load high scores
+             loadHighScores();
+             
+             // Create initial candlesticks (1 and 2) with varied sizes
+             createCandlestick(100, canvas.height - 100, 100, 'bullish');
+             createCandlestick(220, canvas.height - 120, 120, 'bullish');
+             
+             // Set lava floor position
+             lavaFloor.y = canvas.height - 50;
+             
+             // Set player starting position on top of the first candlestick
+             player.x = 100 + (35 / 2) - (player.width / 2); // Centered on first candlestick
+             player.y = canvas.height - 160; // Higher above the candlestick for better visibility
+             
+             gameState = 'playing';
+             
+             // Start music when game starts
+             setTimeout(() => {
+                 startMusic();
+             }, 1000);
+             
+             gameLoop();
+         }
+         
+         // High Score System Functions
+         function loadHighScores() {
+             const saved = localStorage.getItem('candlestickHighScores');
+             if (saved) {
+                 highScores = JSON.parse(saved);
+             } else {
+                 // Default high scores
+                 highScores = [
+                     { name: 'PRO', score: 150, date: '2024-01-01' },
+                     { name: 'CHAMP', score: 120, date: '2024-01-01' },
+                     { name: 'LEGEND', score: 100, date: '2024-01-01' },
+                     { name: 'HERO', score: 80, date: '2024-01-01' },
+                     { name: 'STAR', score: 60, date: '2024-01-01' }
+                 ];
+             }
+         }
+         
+         function saveHighScores() {
+             localStorage.setItem('candlestickHighScores', JSON.stringify(highScores));
+         }
+         
+         function checkHighScore() {
+             if (score > 0) {
+                 // Check if this score qualifies for top 5
+                 const minScore = highScores.length > 0 ? highScores[highScores.length - 1].score : 0;
+                 
+                 if (score > minScore || highScores.length < 5) {
+                     isNewHighScore = true;
+                     currentHighScore = score;
+                     showHighScoreForm = true;
+                     
+                     // Add to high scores
+                     const newScore = {
+                         name: playerName || 'ANONYMOUS',
+                         score: score,
+                         date: new Date().toISOString().split('T')[0]
+                     };
+                     
+                     highScores.push(newScore);
+                     highScores.sort((a, b) => b.score - a.score); // Sort by score descending
+                     
+                     // Keep only top 5
+                     if (highScores.length > 5) {
+                         highScores = highScores.slice(0, 5);
+                     }
+                     
+                     saveHighScores();
+                 }
+             }
+         }
+         
+         function submitHighScore() {
+             if (playerName.trim()) {
+                 // Update the last added score with the player name
+                 const lastScore = highScores.find(hs => hs.score === currentHighScore);
+                 if (lastScore) {
+                     lastScore.name = playerName.trim().toUpperCase();
+                     saveHighScores();
+                 }
+                 
+                 showHighScoreForm = false;
+                 isNewHighScore = false;
+             }
+         }
+         
+         // Create realistic candlestick with varied sizes
+         function createCandlestick(x, y, value, type) {
+             const isBullish = type === 'bullish';
+             
+             // Much more varied body heights for realistic chart appearance
+             const minHeight = 20; // Very small candles
+             const maxHeight = 120; // Very large candles
+             
+             // Random body height with some influence from value
+             const randomFactor = Math.random() * 0.8 + 0.2; // 0.2 to 1.0
+             const valueInfluence = Math.abs(value - 100) / 100; // How much value affects size
+             const bodyHeight = Math.floor(minHeight + (maxHeight - minHeight) * (randomFactor * 0.7 + valueInfluence * 0.3));
+             
+             // Varied wick lengths - some very short, some very long
+             const wickVariation = Math.random();
+             let upperWick, lowerWick;
+             
+             if (wickVariation < 0.3) {
+                 // Short wicks (30% chance)
+                 upperWick = Math.random() * 15 + 5;
+                 lowerWick = Math.random() * 15 + 5;
+             } else if (wickVariation < 0.7) {
+                 // Medium wicks (40% chance)
+                 upperWick = Math.random() * 30 + 15;
+                 lowerWick = Math.random() * 30 + 15;
+             } else {
+                 // Long wicks (30% chance)
+                 upperWick = Math.random() * 50 + 30;
+                 lowerWick = Math.random() * 50 + 30;
+             }
+             
+             // Random width variation for more realistic appearance
+             const widthVariation = Math.random() * 10 + 30; // 30 to 40px
+             
+             const candlestick = {
+                 x: x,
+                 y: y,
+                 width: widthVariation, // Variable width
+                 bodyHeight: bodyHeight,
+                 upperWick: upperWick, // Separate upper and lower wicks
+                 lowerWick: lowerWick,
+                 value: value,
+                 type: type,
+                 color: isBullish ? '#4CAF50' : '#F44336',
+                 bodyColor: isBullish ? '#66BB6A' : '#EF5350',
+                 visited: false // Track if player has landed on this candlestick
+             };
+             
+             candlesticks.push(candlestick);
+         }
+        
+                 // Draw realistic candlestick chart style with varied sizes
+         function drawCandlestick(candlestick) {
+             const x = candlestick.x - camera.x;
+             const y = candlestick.y - camera.y;
+             
+             // Calculate wick positions (upper and lower wicks separate)
+             const upperWickTop = y - candlestick.upperWick;
+             const lowerWickBottom = y + candlestick.bodyHeight + candlestick.lowerWick;
+             
+             // Draw upper wick (above body)
+             ctx.strokeStyle = '#666'; // Dark gray wick
+             ctx.lineWidth = 2;
+             ctx.beginPath();
+             ctx.moveTo(x + candlestick.width / 2, y);
+             ctx.lineTo(x + candlestick.width / 2, upperWickTop);
+             ctx.stroke();
+             
+             // Draw lower wick (below body)
+             ctx.beginPath();
+             ctx.moveTo(x + candlestick.width / 2, y + candlestick.bodyHeight);
+             ctx.lineTo(x + candlestick.width / 2, lowerWickBottom);
+             ctx.stroke();
+             
+             // Draw body with outline
+             ctx.fillStyle = candlestick.bodyColor;
+             ctx.fillRect(x, y, candlestick.width, candlestick.bodyHeight);
+             
+             // Draw body outline
+             ctx.strokeStyle = '#333'; // Dark gray outline
+             ctx.lineWidth = 1;
+             ctx.strokeRect(x, y, candlestick.width, candlestick.bodyHeight);
+             
+             // No numerical labels - cleaner chart appearance
+             // Only small trend indicator for gameplay
+             ctx.fillStyle = candlestick.type === 'bullish' ? '#4CAF50' : '#F44336';
+             ctx.font = '8px Arial';
+             ctx.fillText(candlestick.type === 'bullish' ? '↗' : '↘', x + candlestick.width / 2, upperWickTop - 5);
+         }
+        
+        // Draw player character - Cartoon Face
+        function drawPlayer() {
+            const x = player.x - camera.x;
+            const y = player.y - camera.y;
+            
+            // Draw shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(x + 2, y + 2, player.width, player.height);
+            
+            // Draw white circular face background
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(x + player.width/2, y + player.height/2, player.width/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw black outline
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw thick rectangular glasses frames
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 3, y + 8, 12, 12); // Left lens frame
+            ctx.fillRect(x + 15, y + 8, 12, 12); // Right lens frame
+            
+            // Draw white lenses
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x + 4, y + 9, 10, 10); // Left lens
+            ctx.fillRect(x + 16, y + 9, 10, 10); // Right lens
+            
+            // Draw black pupils looking slightly right
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 6, y + 11, 4, 4); // Left pupil
+            ctx.fillRect(x + 18, y + 11, 4, 4); // Right pupil
+            
+            // Draw angry eyebrows
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x + 5, y + 6);
+            ctx.lineTo(x + 12, y + 4);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 12, y + 4);
+            ctx.lineTo(x + 19, y + 6);
+            ctx.stroke();
+            
+            // Draw simple curved nose
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x + player.width/2, y + 18, 2, 0, Math.PI);
+            ctx.stroke();
+            
+            // Draw wide maniacal grin with teeth
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 8, y + 22, 16, 3); // Upper lip
+            
+            // Draw white teeth
+            ctx.fillStyle = '#fff';
+            for (let i = 0; i < 6; i++) {
+                ctx.fillRect(x + 9 + (i * 2.5), y + 25, 2, 3);
+            }
+            
+            // Draw chin lines (stubble effect)
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 8 + (i * 2), y + 32);
+                ctx.lineTo(x + 10 + (i * 2), y + 34);
+                ctx.stroke();
+            }
+        }
+        
+                 // Update player physics
+         function updatePlayer() {
+             // Don't update player if game is over
+             if (gameOver) return;
+             
+             // Apply gravity
+             player.vy += gravity;
+             
+             // Move player
+             player.x += player.vx;
+             player.y += player.vy;
+             
+             // Check candlestick collisions and award points
+             player.onGround = false;
+             candlesticks.forEach(candlestick => {
+                 if (player.x < candlestick.x + candlestick.width &&
+                     player.x + player.width > candlestick.x &&
+                     player.y + player.height >= candlestick.y &&
+                     player.y + player.height <= candlestick.y + candlestick.bodyHeight) {
+                     
+                     // Check if this is a new candlestick the player hasn't landed on yet
+                     if (!candlestick.visited) {
+                         candlestick.visited = true;
+                         score += 1; // Award 1 point for each new candlestick landed on
+                         
+                         // Play score sound effect
+                         playSoundEffect('score');
+                         
+                         // Show score popup
+                         scorePopup = {
+                             x: candlestick.x,
+                             y: candlestick.y - 50,
+                             text: '+1',
+                             time: Date.now(),
+                             alpha: 1
+                         };
+                         
+                         // Create next candlestick automatically when landing on this one
+                         createNextCandlestick();
+                     }
+                     
+                     player.y = candlestick.y - player.height;
+                     player.vy = 0;
+                     player.onGround = true;
+                 }
+             });
+             
+             // Check for game over (player touched lava or got left behind)
+             if (player.y + player.height >= lavaFloor.y || player.x < camera.x - 150) {
+                 if (!gameOver) {
+                     gameOver = true;
+                     gameOverTime = Date.now(); // Record when game over happened
+                     console.log('Game Over! Player touched lava or got left behind');
+                     
+                     // Create death particles
+                     createDeathParticles();
+                     
+                     // Stop player movement completely
+                     player.vx = 0;
+                     player.vy = 0;
+                     
+                     // Force player to stay in place
+                     player.x = Math.max(camera.x - 100, player.x);
+                     player.y = Math.min(lavaFloor.y - player.height - 10, player.y);
+                     
+                     // Check for high score
+                     checkHighScore();
+                 }
+                 return;
+             }
+             
+             // Keep player in bounds
+             if (player.y > canvas.height - 100) {
+                 player.y = canvas.height - 100;
+                 player.vy = 0;
+                 player.onGround = true;
+             }
+             
+             // Camera follow player
+             camera.x = player.x - canvas.width / 3;
+             camera.x = Math.max(0, camera.x);
+         }
+        
+                 // Handle input
+         function handleInput() {
+             // Don't handle input if game is over
+             if (gameOver) return;
+             
+             // Horizontal movement
+             if (keys['a'] || keys['ArrowLeft']) {
+                 player.vx = -moveSpeed;
+             } else if (keys['d'] || keys['ArrowRight']) {
+                 player.vx = moveSpeed;
+             } else {
+                 player.vx = 0;
+             }
+             
+             // Jump
+             if ((keys['w'] || keys['ArrowUp'] || keys[' ']) && player.onGround) {
+                 player.vy = jumpPower;
+                 player.onGround = false;
+                 
+                 // Play jump sound effect
+                 playSoundEffect('jump');
+             }
+         }
+        
+         // Game loop
+         function gameLoop() {
+             if (gameState !== 'playing') return;
+             
+             // Clear canvas
+             ctx.clearRect(0, 0, canvas.width, canvas.height);
+             
+             // Handle input
+             handleInput();
+             
+             // Update game objects
+             updatePlayer();
+             
+             // Draw background
+             drawBackground();
+             
+             // Draw candlesticks
+             candlesticks.forEach(drawCandlestick);
+             
+             // Draw player
+             drawPlayer();
+             
+             // Update and draw death particles
+             updateDeathParticles();
+             
+             // Draw UI
+             drawUI();
+             
+             // Continue game loop even during game over (for UI display)
+             requestAnimationFrame(gameLoop);
+         }
+        
+         // Draw background
+         function drawBackground() {
+             // Gradient background
+             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+             gradient.addColorStop(0, '#1a1a2e');
+             gradient.addColorStop(0.5, '#16213e');
+             gradient.addColorStop(1, '#0f3460');
+             ctx.fillStyle = gradient;
+             ctx.fillRect(0, 0, canvas.width, canvas.height);
+             
+             // Grid lines
+             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+             ctx.lineWidth = 1;
+             
+             for (let x = 0; x < canvas.width; x += 50) {
+                 ctx.beginPath();
+                 ctx.moveTo(x, 0);
+                 ctx.lineTo(x, canvas.height);
+                 ctx.stroke();
+             }
+             
+             for (let y = 0; y < canvas.height; y += 50) {
+                 ctx.beginPath();
+                 ctx.moveTo(0, y);
+                 ctx.lineTo(canvas.width, y);
+                 ctx.stroke();
+             }
+             
+             // Draw lava floor
+             drawLavaFloor();
+         }
+         
+         // Draw animated lava floor
+         function drawLavaFloor() {
+             const time = Date.now() * 0.005; // Animation speed
+             
+             // Main lava body
+             ctx.fillStyle = lavaFloor.color;
+             ctx.fillRect(0, lavaFloor.y, canvas.width, lavaFloor.height);
+             
+             // Animated lava surface with bubbles
+             ctx.fillStyle = lavaFloor.glowColor;
+             for (let x = 0; x < canvas.width; x += 30) {
+                 const bubbleY = lavaFloor.y + Math.sin(x * 0.02 + time) * 3;
+                 const bubbleSize = 2 + Math.sin(x * 0.03 + time * 2) * 2;
+                 
+                 ctx.beginPath();
+                 ctx.arc(x, bubbleY, bubbleSize, 0, Math.PI * 2);
+                 ctx.fill();
+             }
+             
+             // Lava glow effect
+             const glowGradient = ctx.createLinearGradient(0, lavaFloor.y - 20, 0, lavaFloor.y + lavaFloor.height);
+             glowGradient.addColorStop(0, 'rgba(255, 69, 0, 0.3)');
+             glowGradient.addColorStop(1, 'rgba(255, 69, 0, 0.8)');
+             ctx.fillStyle = glowGradient;
+             ctx.fillRect(0, lavaFloor.y - 20, canvas.width, 20);
+             
+             // Warning text above lava
+             ctx.fillStyle = '#FF4500';
+             ctx.font = 'bold 16px Arial';
+             ctx.textAlign = 'center';
+             ctx.fillText('🔥 LAVA - DON\'T TOUCH! 🔥', canvas.width / 2, lavaFloor.y - 10);
+             
+             // Draw pattern direction arrows
+             drawPatternArrows();
+         }
+         
+         // Draw pattern direction arrows
+         function drawPatternArrows() {
+             const arrowY = 100;
+             const arrowSize = 20;
+             
+             if (patternDirection === 'bullish') {
+                 // Green up arrow
+                 ctx.fillStyle = '#4CAF50';
+                 ctx.font = 'bold 24px Arial';
+                 ctx.textAlign = 'center';
+                 ctx.fillText('⬆️ BULLISH', canvas.width / 2, arrowY);
+             } else {
+                 // Red down arrow
+                 ctx.fillStyle = '#F44336';
+                 ctx.font = 'bold 24px Arial';
+                 ctx.textAlign = 'center';
+                 ctx.fillText('⬇️ BEARISH', canvas.width / 2, arrowY);
+             }
+         }
+         
+         // Create next candlestick automatically when player lands on one
+         function createNextCandlestick() {
+             const lastCandlestick = candlesticks[candlesticks.length - 1];
+             if (!lastCandlestick) return;
+             
+             // Calculate next position (moving right and slightly up for bullish trend)
+             const newX = lastCandlestick.x + 120; // Wider spacing for challenging jumps
+             
+             // Calculate current height percentage for infinite pattern
+             const currentHeight = canvas.height - lastCandlestick.y;
+             const heightPercentage = (currentHeight / (canvas.height - 100)) * 100;
+             
+             // Calculate height limits (20% to 80% of screen)
+             const minHeight = canvas.height * 0.2; // 20% from top
+             const maxHeight = canvas.height * 0.8; // 80% from top
+             
+             // Much more random and varied pattern like real charts
+             let newY, newValue, newType;
+             
+             // Higher randomness for more realistic market movements
+             const randomDirection = Math.random();
+             const trendInfluence = 0.2; // Reduced trend influence for more randomness
+             
+             // More varied movement distances
+             const movementVariation = Math.random();
+             let movementDistance;
+             
+             if (movementVariation < 0.3) {
+                 // Small movements (30% chance)
+                 movementDistance = Math.random() * 30 + 10;
+             } else if (movementVariation < 0.7) {
+                 // Medium movements (40% chance)
+                 movementDistance = Math.random() * 60 + 30;
+             } else {
+                 // Large movements (30% chance)
+                 movementDistance = Math.random() * 80 + 60;
+             }
+             
+             if (randomDirection < 0.5 + (patternDirection === 'bullish' ? trendInfluence : -trendInfluence)) {
+                 // Bullish pattern (upward)
+                 newY = lastCandlestick.y - movementDistance;
+                 newValue = lastCandlestick.value + Math.floor(Math.random() * 40 + 15);
+                 newType = 'bullish';
+                 score += 10;
+                 patternDirection = 'bullish';
+             } else {
+                 // Bearish pattern (downward)
+                 newY = lastCandlestick.y + movementDistance;
+                 newValue = Math.max(50, lastCandlestick.value - Math.floor(Math.random() * 35 + 15));
+                 newType = 'bearish';
+                 score += 5;
+                 patternDirection = 'bearish';
+             }
+             
+             // Enforce height limits (20% to 80% of screen)
+             newY = Math.max(minHeight, Math.min(maxHeight, newY));
+             newValue = Math.max(50, Math.min(300, newValue));
+             
+             // Track highest candlestick for achievement
+             if (newY < highestCandlestick || highestCandlestick === 0) {
+                 highestCandlestick = newY;
+                 score += 25; // Bonus for reaching new heights
+             }
+             
+             // Create the new candlestick
+             createCandlestick(newX, newY, newValue, newType);
+         }
+         
+         // Create death particles when player touches lava
+         function createDeathParticles() {
+             deathParticles = [];
+             for (let i = 0; i < 20; i++) {
+                 deathParticles.push({
+                     x: player.x + player.width / 2,
+                     y: player.y + player.height / 2,
+                     vx: (Math.random() - 0.5) * 8,
+                     vy: (Math.random() - 0.5) * 8,
+                     life: 1,
+                     decay: 0.02,
+                     color: ['#FF4500', '#FF6347', '#FF8C00', '#FFD700'][Math.floor(Math.random() * 4)]
+                 });
+             }
+             
+             // Play death sound effect
+             playSoundEffect('death');
+         }
+         
+         function playSoundEffect(type) {
+             if (!audioContext || !musicStarted) return;
+             
+             const osc = audioContext.createOscillator();
+             const gain = audioContext.createGain();
+             const filter = audioContext.createBiquadFilter();
+             
+             switch(type) {
+                 case 'death':
+                     osc.type = 'sawtooth';
+                     osc.frequency.setValueAtTime(150, audioContext.currentTime);
+                     
+                     // Add filter sweep for electronic effect
+                     filter.type = 'lowpass';
+                     filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+                     filter.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+                     
+                     gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                     gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                     
+                     osc.connect(filter);
+                     filter.connect(gain);
+                     gain.connect(musicGain);
+                     
+                     osc.start(audioContext.currentTime);
+                     osc.stop(audioContext.currentTime + 0.3);
+                     break;
+                     
+                 case 'jump':
+                     osc.type = 'square';
+                     osc.frequency.setValueAtTime(600, audioContext.currentTime);
+                     
+                     // Add pitch bend for electronic feel
+                     osc.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                     
+                     gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                     gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                     
+                     osc.connect(gain);
+                     gain.connect(musicGain);
+                     
+                     osc.start(audioContext.currentTime);
+                     osc.stop(audioContext.currentTime + 0.1);
+                     break;
+                     
+                 case 'score':
+                     osc.type = 'sawtooth';
+                     osc.frequency.setValueAtTime(1000, audioContext.currentTime);
+                     
+                     // Add harmonic for electronic sound
+                     const osc2 = audioContext.createOscillator();
+                     const gain2 = audioContext.createGain();
+                     osc2.type = 'triangle';
+                     osc2.frequency.setValueAtTime(1500, audioContext.currentTime);
+                     
+                     gain2.gain.setValueAtTime(0.1, audioContext.currentTime);
+                     gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                     
+                     osc.connect(gain);
+                     gain.connect(musicGain);
+                     osc2.connect(gain2);
+                     gain2.connect(musicGain);
+                     
+                     osc.start(audioContext.currentTime);
+                     osc.stop(audioContext.currentTime + 0.2);
+                     osc2.start(audioContext.currentTime);
+                     osc2.stop(audioContext.currentTime + 0.2);
+                     return; // Don't connect osc again
+                     break;
+             }
+             
+             osc.connect(gain);
+             gain.connect(musicGain);
+         }
+         
+
+         
+         // Restart game function
+         function restartGame() {
+             console.log('Restarting game...');
+             
+             // Stop current game loop
+             gameState = 'restarting';
+             
+             // Clear all game objects
+             candlesticks = [];
+             deathParticles = [];
+             scorePopup = null;
+             
+             // Reset all game variables
+             score = 0;
+             gameOver = false;
+             gameOverTime = 0;
+             trendStrength = 0;
+             patternDirection = 'bullish';
+             patternHeight = 0;
+             restartCooldown = false;
+             
+             // Reset high score system variables
+             playerName = '';
+             showHighScoreForm = false;
+             isNewHighScore = false;
+             currentHighScore = 0;
+             
+             // Reset player
+               player.x = 100 + (35 / 2) - (player.width / 2);
+               player.y = canvas.height - 160;
+             player.vx = 0;
+             player.vy = 0;
+             player.onGround = false;
+             
+             // Reset camera
+             camera.x = 0;
+             camera.y = 0;
+             
+             // Wait a bit then restart
+             setTimeout(() => {
+                 console.log('Game restarted successfully!');
+                 gameState = 'playing';
+                 init();
+             }, 100);
+         }
+         
+         // Update and draw death particles
+         function updateDeathParticles() {
+             if (deathParticles.length === 0) return;
+             
+             for (let i = deathParticles.length - 1; i >= 0; i--) {
+                 const particle = deathParticles[i];
+                 
+                 // Update particle
+                 particle.x += particle.vx;
+                 particle.y += particle.vy;
+                 particle.life -= particle.decay;
+                 
+                 // Draw particle
+                 ctx.save();
+                 ctx.globalAlpha = particle.life;
+                 ctx.fillStyle = particle.color;
+                 ctx.beginPath();
+                 ctx.arc(particle.x - camera.x, particle.y - camera.y, 3, 0, Math.PI * 2);
+                 ctx.fill();
+                 ctx.restore();
+                 
+                 // Remove dead particles
+                 if (particle.life <= 0) {
+                     deathParticles.splice(i, 1);
+                 }
+             }
+         }
+        
+                 // Draw UI
+         function drawUI() {
+             if (gameOver) {
+                 // Animated Game Over popup with entrance animation
+                 const popupWidth = 400;
+                 const popupHeight = 300;
+                 const popupX = canvas.width / 2 - popupWidth / 2;
+                 const popupY = canvas.height / 2 - popupHeight / 2;
+                 
+                 // Calculate animation progress (0 to 1 over 500ms)
+                 const animationProgress = Math.min(1, (Date.now() - gameOverTime) / 500);
+                 const scale = 0.5 + (animationProgress * 0.5); // Start small, grow to normal
+                 const opacity = animationProgress;
+                 
+                 // Semi-transparent background overlay with fade in
+                 ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * opacity})`;
+                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+                 
+                 // Apply scaling transformation for popup with shake effect
+                 ctx.save();
+                 ctx.translate(canvas.width / 2, canvas.height / 2);
+                 ctx.scale(scale, scale);
+                 
+                 // Add shake effect when popup appears
+                 if (animationProgress > 0.8) {
+                     const shakeIntensity = (1 - animationProgress) * 3;
+                     const shakeX = (Math.random() - 0.5) * shakeIntensity;
+                     const shakeY = (Math.random() - 0.5) * shakeIntensity;
+                     ctx.translate(shakeX, shakeY);
+                 }
+                 
+                 ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                 
+                 // Popup background with shadow
+                 ctx.fillStyle = '#1a1a2e';
+                 ctx.fillRect(popupX, popupY, popupWidth, popupHeight);
+                 
+                 // Popup border
+                 ctx.strokeStyle = '#FF0000';
+                 ctx.lineWidth = 4;
+                 ctx.strokeRect(popupX, popupY, popupWidth, popupHeight);
+                 
+                 // RUG! text in red with glow effect
+                 ctx.fillStyle = '#FF0000';
+                 ctx.font = 'bold 72px Arial';
+                 ctx.textAlign = 'center';
+                 ctx.fillText('RUG!', canvas.width / 2, popupY + 80);
+                 
+                 // "GAME OVER" message
+                 ctx.fillStyle = '#FF6B6B';
+                 ctx.font = 'bold 36px Arial';
+                 ctx.fillText('GAME OVER!', canvas.width / 2, popupY + 130);
+                 
+                 // "YOU LOST!" message
+                 ctx.fillStyle = '#FF4444';
+                 ctx.font = 'bold 28px Arial';
+                 ctx.fillText('YOU LOST!', canvas.width / 2, popupY + 160);
+                 
+                 // "BURNED IN LAVA!" message
+                 ctx.fillStyle = '#FF4500';
+                 ctx.font = 'bold 24px Arial';
+                 ctx.fillText('🔥 BURNED IN LAVA! 🔥', canvas.width / 2, popupY + 190);
+                 
+                 // Score display
+                 ctx.fillStyle = '#fff';
+                 ctx.font = '24px Arial';
+                 ctx.fillText(`Final Score: ${score}`, canvas.width / 2, popupY + 220);
+                 
+                 // Candlesticks count
+                 ctx.fillText(`Candlesticks Survived: ${candlesticks.length}`, canvas.width / 2, popupY + 250);
+                 
+                 // Instructions to restart
+                 ctx.fillStyle = '#4CAF50';
+                 ctx.font = 'bold 20px Arial';
+                 ctx.fillText('Press R key to restart', canvas.width / 2, popupY + 290);
+                 
+                 // High Score Form
+                 if (showHighScoreForm && isNewHighScore) {
+                     // High score form background
+                     ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                     ctx.fillRect(popupX + 50, popupY + 320, popupWidth - 100, 200);
+                     
+                     // Form title
+                     ctx.fillStyle = '#FFD700';
+                     ctx.font = 'bold 24px Arial';
+                     ctx.fillText('🏆 NEW HIGH SCORE! 🏆', canvas.width / 2, popupY + 350);
+                     
+                     // Score display
+                     ctx.fillStyle = '#fff';
+                     ctx.font = '20px Arial';
+                     ctx.fillText(`Score: ${currentHighScore}`, canvas.width / 2, popupY + 380);
+                     
+                     // Instructions
+                     ctx.fillStyle = '#4CAF50';
+                     ctx.font = '16px Arial';
+                     ctx.fillText('Type your name and press ENTER', canvas.width / 2, popupY + 410);
+                     
+                     // Input field (visual representation)
+                     ctx.fillStyle = '#333';
+                     ctx.fillRect(popupX + 100, popupY + 420, popupWidth - 200, 30);
+                     ctx.strokeStyle = '#4CAF50';
+                     ctx.lineWidth = 2;
+                     ctx.strokeRect(popupX + 100, popupY + 420, popupWidth - 200, 30);
+                     
+                     // Player name display
+                     ctx.fillStyle = '#fff';
+                     ctx.font = '18px Arial';
+                     ctx.fillText(playerName || 'Type here...', popupX + 110, popupY + 440);
+                     
+                     // Submit button
+                     ctx.fillStyle = '#4CAF50';
+                     ctx.fillRect(popupX + 150, popupY + 460, 100, 30);
+                     ctx.fillStyle = '#fff';
+                     ctx.font = '16px Arial';
+                     ctx.fillText('SUBMIT', popupX + 200, popupY + 480);
+                     
+                     // Close button (X)
+                     ctx.fillStyle = '#F44336';
+                     ctx.fillRect(popupX + 320, popupY + 460, 30, 30);
+                     ctx.fillStyle = '#fff';
+                     ctx.font = 'bold 20px Arial';
+                     ctx.fillText('X', popupX + 335, popupY + 480);
+                 }
+                 
+                 // High Scores List
+                 if (highScores.length > 0) {
+                     // High scores background
+                     ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                     ctx.fillRect(popupX + 50, popupY + 540, popupWidth - 100, 150);
+                     
+                     // Title
+                     ctx.fillStyle = '#FFD700';
+                     ctx.font = 'bold 20px Arial';
+                     ctx.fillText('🏆 TOP 5 HIGH SCORES 🏆', canvas.width / 2, popupY + 570);
+                     
+                     // High scores list
+                     ctx.fillStyle = '#fff';
+                     ctx.font = '16px Arial';
+                     ctx.textAlign = 'left';
+                     
+                     highScores.forEach((hs, index) => {
+                         const yPos = popupY + 600 + (index * 25);
+                         const isCurrentScore = hs.score === currentHighScore && hs.name === (playerName || 'ANONYMOUS');
+                         
+                         // Highlight current score
+                         if (isCurrentScore) {
+                             ctx.fillStyle = '#FFD700';
+                             ctx.fillRect(popupX + 60, yPos - 15, popupWidth - 120, 20);
+                             ctx.fillStyle = '#000';
+                         } else {
+                             ctx.fillStyle = '#fff';
+                         }
+                         
+                         ctx.fillText(`${index + 1}. ${hs.name}`, popupX + 70, yPos);
+                         ctx.fillText(`${hs.score}`, popupX + 200, yPos);
+                         ctx.fillText(hs.date, popupX + 280, yPos);
+                     });
+                     
+                     ctx.textAlign = 'center'; // Reset text alignment
+                 }
+                 
+                 // Show restart cooldown message
+                 if (restartCooldown) {
+                     ctx.fillStyle = '#FF9800';
+                     ctx.font = 'bold 18px Arial';
+                     ctx.fillText('Restarting... Please wait', canvas.width / 2, popupY + 720);
+                 }
+                 
+                 ctx.restore(); // Restore transformation
+                 return;
+             }
+             
+             // Normal game UI - Organized and spaced properly
+             // Top left section - Game stats
+             ctx.fillStyle = '#fff';
+             ctx.font = 'bold 20px Arial';
+             ctx.textAlign = 'left';
+             
+             // Score and candlesticks (top row)
+             ctx.fillText(`Score: ${score}`, 20, 35);
+             ctx.fillText(`Candlesticks: ${candlesticks.length}`, 200, 35);
+             
+             // Pattern and height (second row)
+             ctx.fillStyle = patternDirection === 'bullish' ? '#4CAF50' : '#F44336';
+             ctx.fillText(`Pattern: ${patternDirection === 'bullish' ? 'BULLISH' : 'BEARISH'}`, 20, 65);
+             
+             // Height percentage indicator with limits
+             const currentHeight = candlesticks.length > 0 ? 
+                 Math.round(((canvas.height - candlesticks[candlesticks.length - 1].y) / (canvas.height - 100)) * 100) : 0;
+             
+             // Color based on height limits (20% to 80%)
+             let heightColor;
+             if (currentHeight < 20) heightColor = '#F44336'; // Too low (red)
+             else if (currentHeight > 80) heightColor = '#F44336'; // Too high (red)
+             else if (currentHeight < 40) heightColor = '#4CAF50'; // Good low (green)
+             else if (currentHeight > 60) heightColor = '#4CAF50'; // Good high (green)
+             else heightColor = '#FF9800'; // Middle range (orange)
+             
+             ctx.fillStyle = heightColor;
+             ctx.fillText(`Height: ${currentHeight}% (20%-80%)`, 200, 65);
+             
+             // Player position (third row, smaller font)
+             ctx.fillStyle = '#ccc';
+             ctx.font = '14px Arial';
+             ctx.fillText(`Position: ${Math.floor(player.x)}, ${Math.floor(player.y)}`, 20, 85);
+             
+             // High score indicator (fourth row)
+             if (highScores.length > 0) {
+                 const bestScore = highScores[1].score;
+                 ctx.fillStyle = '#FFD700';
+                 ctx.font = 'bold 16px Arial';
+                 ctx.fillText(`Best: ${bestScore}`, 20, 105);
+             }
+             
+             // Music controls (fifth row)
+             ctx.fillStyle = '#9C27B0';
+             ctx.font = 'bold 14px Arial';
+             ctx.fillText(`Music: ${musicStarted ? 'ON' : 'OFF'}`, 20, 125);
+             ctx.fillText(`Vol: ${Math.round(musicVolume * 100)}%`, 120, 125);
+             
+             // Draw score popup if exists
+             if (scorePopup) {
+                 const timeSincePopup = Date.now() - scorePopup.time;
+                 if (timeSincePopup < 1000) { // Show for 1 second
+                     scorePopup.alpha = 1 - (timeSincePopup / 1000);
+                     scorePopup.y -= 0.5; // Move up slowly
+                     
+                     ctx.save();
+                     ctx.globalAlpha = scorePopup.alpha;
+                     ctx.fillStyle = '#4CAF50';
+                     ctx.font = 'bold 24px Arial';
+                     ctx.textAlign = 'center';
+                     ctx.fillText(scorePopup.text, scorePopup.x - camera.x, scorePopup.y - camera.y);
+                     ctx.restore();
+                 } else {
+                     scorePopup = null; // Remove popup after animation
+                 }
+             }
+         }
+        
+                 // Event listeners
+         document.addEventListener('keydown', (e) => {
+             // Handle restart with R key
+             if (e.key.toLowerCase() === 'r' && gameOver) {
+                 restartGame();
+                 return;
+             }
+             
+             // Handle high score input
+             if (showHighScoreForm && isNewHighScore) {
+                 if (e.key === 'Enter') {
+                     submitHighScore();
+                     return;
+                 } else if (e.key === 'Backspace') {
+                     playerName = playerName.slice(0, -1);
+                     return;
+                 } else if (e.key.length === 1 && playerName.length < 12) {
+                     // Only allow letters, numbers, and spaces
+                     if (/[a-zA-Z0-9\s]/.test(e.key)) {
+                         playerName += e.key.toUpperCase();
+                     }
+                     return;
+                 }
+             }
+             
+             // Only handle game keys if not in high score form
+             if (!showHighScoreForm) {
+                 keys[e.key.toLowerCase()] = true;
+                 
+                 // Music controls
+                 if (e.key === 'm' || e.key === 'M') {
+                     if (musicStarted) {
+                         stopMusic();
+                     } else {
+                         startMusic();
+                     }
+                 } else if (e.key === '[') {
+                     setMusicVolume(Math.max(0, musicVolume - 0.1));
+                 } else if (e.key === ']') {
+                     setMusicVolume(Math.min(1, musicVolume + 0.1));
+                 }
+             }
+         });
+         
+         document.addEventListener('keyup', (e) => {
+             keys[e.key.toLowerCase()] = false;
+         });
+        
+                 // Click event for high score form buttons
+         canvas.addEventListener('click', (e) => {
+             if (gameState !== 'playing') return;
+             
+             // Handle high score form button clicks
+             if (showHighScoreForm && isNewHighScore && gameOver) {
+                 const rect = canvas.getBoundingClientRect();
+                 const x = e.clientX - rect.left;
+                 const y = e.clientY - rect.top;
+                 
+                 // Check if submit button was clicked
+                 const popupWidth = 400;
+                 const popupHeight = 300;
+                 const popupX = canvas.width / 2 - popupWidth / 2;
+                 const popupY = canvas.height / 2 - popupHeight / 2;
+                 
+                 // Submit button area
+                 if (x >= popupX + 150 && x <= popupX + 250 && 
+                     y >= popupY + 460 && y <= popupY + 490) {
+                     submitHighScore();
+                     return;
+                 }
+                 
+                 // Close button area
+                 if (x >= popupX + 320 && x <= popupX + 350 && 
+                     y >= popupY + 460 && y <= popupY + 490) {
+                     showHighScoreForm = false;
+                     isNewHighScore = false;
+                     return;
+                 }
+             }
+             
+             // Click events can be used for future features
+             // Restart is now only available with R key
+         });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Custom cursor
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Loading screen with progress bar and start button
+        let loadingProgress = 0;
+        let loadingInterval;
+        
+        function updateLoadingBar() {
+            const loadingBar = document.querySelector('.loading-bar');
+            const loadingPercentage = document.querySelector('.loading-percentage');
+            const startButton = document.querySelector('.start-button');
+            
+            if (loadingProgress < 100) {
+                loadingProgress += Math.random() * 15 + 5; // Random progress increment
+                if (loadingProgress > 100) loadingProgress = 100;
+                
+                loadingBar.style.width = loadingProgress + '%';
+                loadingPercentage.textContent = Math.floor(loadingProgress) + '%';
+                
+                if (loadingProgress >= 100) {
+                    clearInterval(loadingInterval);
+                    // Show start button with animation
+                    setTimeout(() => {
+                        startButton.classList.add('show');
+                    }, 500);
+                }
+            }
+        }
+        
+        // Start loading animation
+        loadingInterval = setInterval(updateLoadingBar, 100);
+        
+        // Start button click handler
+        document.querySelector('.start-button').addEventListener('click', () => {
+            // Fade out loading screen
+            const loading = document.querySelector('.loading');
+            loading.style.transition = 'opacity 1s ease, transform 1s ease';
+            loading.style.opacity = '0';
+            loading.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                init(); // Initialize the game
+            }, 1000);
+        });
+
+         // Original interactions
+         document.querySelector('.title').addEventListener('click', () => {
+             // Reset game
+             restartGame();
+         });
+
+         document.querySelector('.more-details').addEventListener('click', () => {
+             // Add multiple candlesticks quickly
+             for (let i = 0; i < 5; i++) {
+                 setTimeout(() => {
+                     const lastCandlestick = candlesticks[candlesticks.length - 1];
+                     if (lastCandlestick) {
+                         const newX = lastCandlestick.x + 100;
+                         const newY = Math.max(50, lastCandlestick.y - (Math.random() * 30 + 10));
+                         const newValue = lastCandlestick.value + Math.floor(Math.random() * 20 + 10);
+                         createCandlestick(newX, newY, newValue, 'bullish');
+                     }
+                 }, i * 200);
+             }
+         });
+
+         document.querySelector('.view-works').addEventListener('click', () => {
+             // Create a big bullish jump
+             const lastCandlestick = candlesticks[candlesticks.length - 1];
+             if (lastCandlestick) {
+                 const newX = lastCandlestick.x + 100;
+                 const newY = Math.max(50, lastCandlestick.y - 60); // Big jump up
+                 const newValue = lastCandlestick.value + 50;
+                 createCandlestick(newX, newY, newValue, 'bullish');
+             }
+         });
+
+        // Navigation buttons
+        document.querySelector('.back-button').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        document.querySelector('.telegram-button').addEventListener('click', () => {
+            window.open('https://t.me/your_channel', '_blank');
+        });
+
+        document.querySelector('.twitter-button').addEventListener('click', () => {
+            window.open('https://twitter.com/your_handle', '_blank');
+        });
+
+        document.querySelector('.menu-button').addEventListener('click', () => {
+            document.querySelector('.settings-panel').style.display = 'block';
+        });
+
+
+
+        document.querySelector('.close-settings').addEventListener('click', () => {
+            document.querySelector('.settings-panel').style.display = 'none';
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'Escape':
+                    document.querySelector('.settings-panel').style.display = 'none';
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
+ 
