@@ -45,10 +45,12 @@
             background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             z-index: 1000;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 2rem 2rem 1rem 2rem;
         }
         
         .loading::before {
@@ -64,8 +66,427 @@
 
         .loading-text {
             font-size: 4rem;
-            font-weight: 300;
+            font-weight: 900;
             margin-bottom: 2rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            position: relative;
+        }
+        
+        .title-main {
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B35, #FF4500);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite, titleFloat 2s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            position: relative;
+            cursor: default;
+        }
+        
+        .title-main::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: blur(8px);
+            opacity: 0.7;
+            z-index: -1;
+        }
+        
+        .title-separator {
+            color: #FFD700;
+            font-size: 3rem;
+            font-weight: 300;
+            animation: separatorPulse 2s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes separatorPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .title-main:hover {
+            animation-play-state: paused;
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Floating particles around title */
+        .loading-text::before,
+        .loading-text::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: particleFloat 4s ease-in-out infinite;
+        }
+        
+        .loading-text::before {
+            top: -20px;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .loading-text::after {
+            top: -30px;
+            right: 20%;
+            animation-delay: 2s;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(0px) scale(1);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.5);
+                opacity: 0.3;
+            }
+        }
+        
+        /* Responsive design for title */
+        @media (max-width: 768px) {
+            .loading-text {
+                font-size: 3.5rem;
+                gap: 0.5rem;
+            }
+            
+            .title-separator {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Wallet Connect Button Styles */
+        .wallet-connect-section {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .connect-wallet-btn {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6, #A855F7);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .connect-wallet-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .connect-wallet-btn:hover::before {
+            left: 100%;
+        }
+        
+        .connect-wallet-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+        
+        .connect-wallet-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        
+        .wallet-icon {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .wallet-text {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .wallet-status {
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .wallet-status.connected {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+        
+        .wallet-status.connected .status-text {
+            color: #22C55E;
+        }
+        
+        .wallet-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        .wallet-status.error .status-text {
+            color: #EF4444;
+        }
+        
+        .status-text {
+            color: #E5E7EB;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Fixed player image positioning on the bottom left side */
+        .player-image-section-fixed {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .landing-player-image {
+            width: 200px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+        
+        .landing-player-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Fixed leaderboard positioning on the left side */
+        .leaderboard-section-fixed {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            width: 380px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Leaderboard Table Styles */
+        .leaderboard-section {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+        
+        .leaderboard-title {
+            color: #FFD700;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 0 0 1.5rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 80px 80px;
+            gap: 0.5rem;
+            padding: 0.8rem 0;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            margin-bottom: 1rem;
+        }
+        
+        .table-header span {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .table-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .leaderboard-entry {
+            display: grid;
+            grid-template-columns: 40px 1fr 80px 80px;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .leaderboard-entry:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .leaderboard-entry.rank-1 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        
+        .leaderboard-entry.rank-2 {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));
+            border-color: rgba(192, 192, 192, 0.5);
+        }
+        
+        .leaderboard-entry.rank-3 {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));
+            border-color: rgba(205, 127, 50, 0.5);
+        }
+        
+        .rank-col {
+            text-align: center;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
+        .wallet-col {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #E5E7EB;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .score-col, .time-col {
+            text-align: center;
+            color: #E5E7EB;
+            font-weight: 500;
+        }
+        
+        /* Responsive design for fixed elements */
+        @media (max-width: 1200px) {
+            .player-image-section-fixed {
+                /* Mantener fijo en la esquina inferior izquierda */
+                position: fixed;
+                bottom: 1rem;
+                left: 1rem;
+            }
+            
+            .landing-player-image {
+                width: 120px; /* Un poco más pequeño en pantallas pequeñas */
+            }
+            
+            .wallet-connect-section {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+            }
+            
+            .leaderboard-section-fixed {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                width: 320px;
+            }
+        }
+        
+        /* Additional responsive adjustments for better spacing */
+        @media (max-width: 768px) {
+            .loading {
+                padding: 1.5rem 1rem 1rem 1rem;
+            }
+            
+            .loading-text {
+                font-size: 3rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .player-image-section-fixed {
+                position: fixed;
+                bottom: 0.5rem;
+                left: 0.5rem;
+            }
+            
+            .landing-player-image {
+                width: 100px; /* Más pequeño en móviles */
+            }
+            
+            .wallet-connect-section {
+                position: fixed;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            
+            .leaderboard-section-fixed {
+                position: fixed;
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 280px;
+                padding: 1rem;
+            }
+            
+            .airdrop-info-box {
+                margin: 1rem auto;
+                padding: 0.875rem;
+            }
+            
+            .loading-bar-container {
+                margin: 1rem 0;
+            }
+            
+            .start-button {
+                margin-top: 1rem;
+            }
+            
+            .landing-social-buttons {
+                margin-top: 1rem;
+            }
         }
 
         .loading-instructions {
@@ -86,7 +507,7 @@
             height: 8px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             overflow: hidden;
             position: relative;
         }
@@ -133,7 +554,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             opacity: 0;
             transform: translateY(20px);
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
@@ -287,6 +708,177 @@
             min-width: 120px;
             text-align: center;
         }
+        
+        /* Landing Page Social Buttons */
+        .landing-social-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .landing-telegram-button, .landing-twitter-button {
+            position: relative;
+            width: 80px;
+            height: 110px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .landing-telegram-button:hover, .landing-twitter-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            filter: brightness(1.2);
+        }
+        
+        .landing-candlestick {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .landing-wick-upper {
+            width: 3px;
+            height: 24px;
+            background: #666;
+            border-radius: 2px;
+            margin-bottom: 3px;
+        }
+        
+        .landing-candle-body {
+            width: 48px;
+            height: 56px;
+            border-radius: 3px;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+        
+        .landing-telegram-button .landing-candle-body {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border-color: #2E7D32;
+        }
+        
+        .landing-twitter-button .landing-candle-body {
+            background: linear-gradient(135deg, #EF5350, #F44336);
+            border-color: #C62828;
+        }
+        
+        .landing-candle-body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 3px;
+        }
+        
+        .landing-wick-lower {
+            width: 3px;
+            height: 20px;
+            background: #666;
+            border-radius: 2px;
+            margin-top: 3px;
+        }
+        
+        .landing-telegram-button span, .landing-twitter-button span {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 4px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        /* Airdrop Information Box Styles */
+        .airdrop-info-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1.25rem auto;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 6px 24px rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .airdrop-info-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .airdrop-info-box h3 {
+            color: #FFD700;
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin: 0 0 0.75rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+        }
+        
+        .airdrop-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        
+        .airdrop-details p {
+            color: #fff;
+            font-size: 0.75rem;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            line-height: 1.4;
+        }
+        
+        .airdrop-details strong {
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        /* Responsive design for airdrop box */
+        @media (max-width: 768px) {
+            .airdrop-info-box {
+                margin: 1.125rem 0.75rem;
+                padding: 0.75rem;
+                max-width: 350px;
+            }
+            
+            .airdrop-info-box h3 {
+                font-size: 1rem;
+            }
+            
+            .airdrop-details p {
+                font-size: 0.7rem;
+            }
+        }
 
         .menu-button {
             bottom: 2rem;
@@ -298,35 +890,7 @@
             left: 2rem;
         }
         
-        .minecraft-button {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            border: 2px solid #2E7D32;
-            border-radius: 8px;
-            padding: 0.4rem 0.8rem;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            width: 60px;
-            height: 40px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        
-        .minecraft-button:hover {
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-            background: linear-gradient(135deg, #66BB6A, #4CAF50);
-            border-color: #388E3C;
-        }
+
 
         .profile {
             position: absolute;
@@ -478,13 +1042,34 @@
 </head>
 <body>
     <div class="loading">
-        <div class="loading-text">PENGPUMP</div>
-                       <div class="loading-instructions">
-                   <div>WASD or Arrow Keys to move</div>
-                   <div>SPACE to jump</div>
-                   <div>Jump on candlesticks to create new ones!</div>
-                   <div>Don't fall into the lava!</div>
-               </div>
+        <div class="loading-text">
+            <span class="title-main">PENG</span>
+            <span class="title-separator">•</span>
+            <span class="title-main">PUMP</span>
+                </div>
+        
+                <!-- Connect Wallet Button -->
+        <div class="wallet-connect-section">
+            <button id="connect-wallet-btn" class="connect-wallet-btn">
+                <span class="wallet-icon">🦊</span>
+                <span class="wallet-text">Connect MetaMask</span>
+            </button>
+            <div id="wallet-status" class="wallet-status">
+                <span class="status-text">Wallet not connected</span>
+            </div>
+        </div>
+        
+        <!-- Airdrop Information Box -->
+        <div class="airdrop-info-box">
+            <h3>🏆 AIRDROP REWARDS SYSTEM</h3>
+            <div class="airdrop-details">
+                <p><strong>🎯 Objective:</strong> Reach the top of the leaderboard to earn airdrops!</p>
+                <p><strong>⏰ Distribution:</strong> Airdrops are distributed every 6 hours</p>
+                <p><strong>🔄 Reset:</strong> Leaderboard resets after each airdrop distribution</p>
+                <p><strong>💰 Rewards:</strong> Top players receive exclusive tokens and rewards</p>
+                <p><strong>🏁 Competition:</strong> Keep jumping and improving your score!</p>
+            </div>
+        </div>
         
         <div class="loading-bar-container">
             <div class="loading-bar"></div>
@@ -494,6 +1079,46 @@
         
         <button class="start-button">START JUMPING</button>
         
+        <!-- Social Media Buttons on Landing Page -->
+        <div class="landing-social-buttons">
+            <div class="landing-telegram-button" onclick="window.open('https://t.me/your_channel', '_blank')">
+                <div class="landing-candlestick">
+                    <div class="landing-wick-upper"></div>
+                    <div class="landing-candle-body"></div>
+                    <div class="landing-wick-lower"></div>
+                </div>
+                <span>Telegram</span>
+            </div>
+            <div class="landing-twitter-button" onclick="window.open('https://x.com/PengPump_ABS', '_blank')">
+                <div class="landing-candlestick">
+                    <div class="landing-wick-upper"></div>
+                    <div class="landing-candle-body"></div>
+                    <div class="landing-wick-lower"></div>
+                </div>
+                <span>Twitter</span>
+            </div>
+        </div>
+        
+        <!-- Player Image (Positioned to the left) -->
+        <div class="player-image-section-fixed">
+            <img src="./player.png" alt="PENGPUMP Player" class="landing-player-image">
+        </div>
+        
+        <!-- Leaderboard Table (Positioned to the right) -->
+        <div class="leaderboard-section-fixed">
+            <h3 class="leaderboard-title">🏆 TOP PLAYERS</h3>
+            <div class="leaderboard-table">
+                <div class="table-header">
+                    <span class="rank-col">#</span>
+                    <span class="wallet-col">Wallet Address</span>
+                    <span class="score-col">Score</span>
+                    <span class="time-col">Time</span>
+                </div>
+                <div class="table-body" id="leaderboard-body">
+                    <!-- Leaderboard entries will be populated here -->
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -503,7 +1128,7 @@
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">jump to create new candlesticks!</p>
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">back</p>
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Telegram & Twitter</p>
-            <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">FLY</p>
+
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">menu</p>
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">restart</p>
             <p style="margin: 0 0 8px 0; font-size: 12px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Pattern: Bullish/Bearish</p>
@@ -516,27 +1141,25 @@
         </div>
 
         <div class="social-buttons">
-            <div class="telegram-button">
+            <div class="telegram-button" onclick="window.open('https://t.me/your_channel', '_blank')">
                 <div class="candlestick">
                     <div class="wick-upper"></div>
                     <div class="candle-body"></div>
                     <div class="wick-lower"></div>
                 </div>
-                <span>TG</span>
+                <span>Telegram</span>
             </div>
-            <div class="twitter-button">
+            <div class="twitter-button" onclick="window.open('https://x.com/PengPump_ABS', '_blank')">
                 <div class="candlestick">
                     <div class="wick-upper"></div>
                     <div class="candle-body"></div>
                     <div class="wick-lower"></div>
                 </div>
-                <span>TW</span>
+                <span>Twitter</span>
             </div>
         </div>
         
-        <div class="minecraft-button">
-            <span>FLY</span>
-        </div>
+
 
         <div class="menu-button">
             <span>menu</span>
@@ -662,12 +1285,26 @@
                   // Death particles for when player touches lava
          let deathParticles = [];
          
-         // High score system variables
-         let highScores = [];
-         let playerName = '';
-         let showHighScoreForm = false;
-         let isNewHighScore = false;
-         let currentHighScore = 0;
+                 // High score system variables
+        let highScores = [];
+        let playerName = '';
+        let showHighScoreForm = false;
+        let isNewHighScore = false;
+        let currentHighScore = 0;
+        
+        // Missile system variables
+        let missiles = [];
+        let missileSpeed = 8; // Even faster for more challenge
+        let missileSpawnInterval = 1500; // 1.5 seconds - very frequent spawning
+        let lastMissileSpawn = 0;
+        let missileDamage = 1;
+        
+        // Audio system variables
+        let audioContext = null;
+        let jumpSound = null;
+        let scoreSound = null;
+        let missileSound = null;
+        let deathSound = null;
          
         
         
@@ -689,6 +1326,9 @@
             // Load player image
             playerImage = new Image();
             playerImage.src = './player.png';
+            
+            // Initialize audio system
+            initAudio();
             
             // Create initial candlesticks (1 and 2) with varied sizes
              createCandlestick(100, canvas.height - 100, 100, 'bullish');
@@ -819,9 +1459,180 @@
              };
              
              candlesticks.push(candlestick);
-         }
+                 }
         
-                 // Draw realistic candlestick chart style with varied sizes
+        // Audio system functions
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                createSounds();
+            } catch (e) {
+                console.log('Audio not supported:', e);
+            }
+        }
+        
+        function createSounds() {
+            // Jump sound (high pitch beep)
+            jumpSound = createBeep(800, 0.1, 'sine');
+            
+            // Score sound (success chime)
+            scoreSound = createBeep(1200, 0.15, 'square');
+            
+            // Missile sound (low pitch whoosh)
+            missileSound = createBeep(300, 0.2, 'sawtooth');
+            
+            // Death sound (low pitch rumble)
+            deathSound = createBeep(150, 0.3, 'triangle');
+        }
+        
+        function createBeep(frequency, duration, type) {
+            if (!audioContext) return null;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            return { oscillator, gainNode, duration };
+        }
+        
+        function playSound(sound) {
+            if (!sound || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = sound.oscillator.frequency.value;
+            oscillator.type = sound.oscillator.type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + sound.duration);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + sound.duration);
+        }
+        
+        // Missile system functions
+        function createMissile() {
+            // Calculate direction towards player with some randomness
+            const targetX = player.x;
+            const targetY = player.y + player.height / 2; // Aim for player center
+            
+            // PREDICT player position based on current velocity (lead the target)
+            const predictionTime = 0.5; // Predict 0.5 seconds ahead
+            const predictedX = targetX + (player.vx * predictionTime);
+            const predictedY = targetY + (player.vy * predictionTime);
+            
+            // PROGRESSIVE DIFFICULTY: Missiles get more precise as you advance
+            const difficultyFactor = Math.min(0.8, candlesticks.length / 50); // 0 to 0.8 based on progress
+            const baseRandomnessX = 40 * (1 - difficultyFactor); // Less randomness as you progress
+            const baseRandomnessY = 30 * (1 - difficultyFactor); // Less randomness as you progress
+            
+            // Add minimal randomness to make missiles more precise
+            const randomOffsetX = (Math.random() - 0.5) * baseRandomnessX;
+            const randomOffsetY = (Math.random() - 0.5) * baseRandomnessY;
+            
+            const finalTargetX = predictedX + randomOffsetX;
+            const finalTargetY = predictedY + randomOffsetY;
+            
+            // Calculate angle to target
+            const dx = finalTargetX - (camera.x + canvas.width);
+            const dy = finalTargetY - (Math.random() * (canvas.height - 200) + 100);
+            const angle = Math.atan2(dy, dx);
+            
+            const missile = {
+                x: camera.x + canvas.width, // Create missile at the right edge of the game world
+                y: Math.random() * (canvas.height - 200) + 100,
+                width: 20,
+                height: 8,
+                speed: missileSpeed,
+                vx: Math.cos(angle) * missileSpeed, // Horizontal velocity component
+                vy: Math.sin(angle) * missileSpeed, // Vertical velocity component
+                active: true
+            };
+            missiles.push(missile);
+            
+            // Play missile sound
+            playSound(missileSound);
+        }
+        
+        function updateMissiles() {
+            const currentTime = Date.now();
+            
+            // Spawn new missiles
+            if (currentTime - lastMissileSpawn > missileSpawnInterval) {
+                createMissile();
+                lastMissileSpawn = currentTime;
+            }
+            
+            // Update existing missiles
+            missiles.forEach((missile, index) => {
+                // Move missile using velocity components
+                missile.x += missile.vx;
+                missile.y += missile.vy;
+                
+                // Remove missiles that are off screen (left, right, top, or bottom)
+                if (missile.x + missile.width < camera.x - 100 || 
+                    missile.x > camera.x + canvas.width + 100 ||
+                    missile.y + missile.height < 0 ||
+                    missile.y > canvas.height + 100) {
+                    missiles.splice(index, 1);
+                }
+                
+                // Check collision with player
+                if (missile.active && 
+                    player.x < missile.x + missile.width &&
+                    player.x + player.width > missile.x &&
+                    player.y < missile.y + missile.height &&
+                    player.y + player.height > missile.y) {
+                    
+                    // Player hit by missile
+                    missile.active = false;
+                    playSound(deathSound);
+                    gameOver = true;
+                    checkHighScore();
+                }
+            });
+        }
+        
+        function drawMissiles() {
+            missiles.forEach(missile => {
+                if (missile.active) {
+                    // Calculate missile rotation based on velocity
+                    const angle = Math.atan2(missile.vy, missile.vx);
+                    
+                    ctx.save();
+                    ctx.translate(missile.x - camera.x + missile.width / 2, missile.y - camera.y + missile.height / 2);
+                    ctx.rotate(angle);
+                    
+                    // Draw missile body (red) - now rotated
+                    ctx.fillStyle = '#FF0000';
+                    ctx.fillRect(-missile.width / 2, -missile.height / 2, missile.width, missile.height);
+                    
+                    // Draw missile tip (orange) - at the front based on direction
+                    ctx.fillStyle = '#FF6600';
+                    ctx.fillRect(missile.width / 2 - 5, -missile.height / 2, 5, missile.height);
+                    
+                    // Draw missile trail (yellow) - behind the missile
+                    ctx.fillStyle = '#FFFF00';
+                    ctx.fillRect(-missile.width / 2 - 8, -2, 8, 4);
+                    
+                    ctx.restore();
+                }
+            });
+        }
+        
+        // Draw realistic candlestick chart style with varied sizes
          function drawCandlestick(candlestick) {
              const x = candlestick.x - camera.x;
              const y = candlestick.y - camera.y;
@@ -896,22 +1707,25 @@
                      player.y + player.height <= candlestick.y + candlestick.bodyHeight) {
                      
                      // Check if this is a new candlestick the player hasn't landed on yet
-                     if (!candlestick.visited) {
-                         candlestick.visited = true;
-                         score += 1; // Award 1 point for each new candlestick landed on
-                         
-                         // Show score popup
-                         scorePopup = {
-                             x: candlestick.x,
-                             y: candlestick.y - 50,
-                             text: '+1',
-                             time: Date.now(),
-                             alpha: 1
-                         };
-                         
-                         // Create next candlestick automatically when landing on this one
-                         createNextCandlestick();
-                     }
+                                         if (!candlestick.visited) {
+                        candlestick.visited = true;
+                        score += 1; // Award 1 point for each new candlestick landed on
+                        
+                        // Play score sound
+                        playSound(scoreSound);
+                        
+                        // Show score popup
+                        scorePopup = {
+                            x: candlestick.x,
+                            y: candlestick.y - 50,
+                            text: '+1',
+                            time: Date.now(),
+                            alpha: 1
+                        };
+                        
+                        // Create next candlestick automatically when landing on this one
+                        createNextCandlestick();
+                    }
                      
                      player.y = candlestick.y - player.height;
                      player.vy = 0;
@@ -969,11 +1783,12 @@
                  player.vx = 0;
              }
              
-             // Jump
-             if ((keys['w'] || keys['ArrowUp'] || keys[' ']) && player.onGround) {
-                 player.vy = jumpPower;
-                 player.onGround = false;
-             }
+                         // Jump
+            if ((keys['w'] || keys['ArrowUp'] || keys[' ']) && player.onGround) {
+                player.vy = jumpPower;
+                player.onGround = false;
+                playSound(jumpSound);
+            }
          }
         
                  // Game loop
@@ -986,23 +1801,27 @@
              // Handle input
              handleInput();
              
-             // Update game objects
-             updatePlayer();
-             
-             // Draw background
-             drawBackground();
-             
-             // Draw candlesticks
-             candlesticks.forEach(drawCandlestick);
-             
-             // Draw player
-             drawPlayer();
-             
-             // Update and draw death particles
-             updateDeathParticles();
-             
-             // Draw UI
-             drawUI();
+                         // Update game objects
+            updatePlayer();
+            updateMissiles();
+            
+            // Draw background
+            drawBackground();
+            
+            // Draw candlesticks
+            candlesticks.forEach(drawCandlestick);
+            
+            // Draw missiles
+            drawMissiles();
+            
+            // Draw player
+            drawPlayer();
+            
+            // Update and draw death particles
+            updateDeathParticles();
+            
+            // Draw UI
+            drawUI();
              
              // Continue game loop even during game over (for UI display)
              requestAnimationFrame(gameLoop);
@@ -1189,19 +2008,21 @@
              // Stop current game loop
              gameState = 'restarting';
              
-             // Clear all game objects
-             candlesticks = [];
-             deathParticles = [];
-             scorePopup = null;
+                         // Clear all game objects
+            candlesticks = [];
+            deathParticles = [];
+            missiles = [];
+            scorePopup = null;
              
-             // Reset all game variables
-             score = 0;
-             gameOver = false;
-             gameOverTime = 0;
-             trendStrength = 0;
-             patternDirection = 'bullish';
-             patternHeight = 0;
-             restartCooldown = false;
+                         // Reset all game variables
+            score = 0;
+            gameOver = false;
+            gameOverTime = 0;
+            trendStrength = 0;
+            patternDirection = 'bullish';
+            patternHeight = 0;
+            restartCooldown = false;
+            lastMissileSpawn = 0;
              
              // Reset high score system variables
              playerName = '';
@@ -1434,9 +2255,10 @@
              ctx.font = 'bold 20px Arial';
              ctx.textAlign = 'left';
              
-             // Score and candlesticks (top row)
-             ctx.fillText(`Score: ${score}`, 20, 35);
-             ctx.fillText(`Candlesticks: ${candlesticks.length}`, 200, 35);
+                         // Score and candlesticks (top row)
+            ctx.fillText(`Score: ${score}`, 20, 35);
+            ctx.fillText(`Candlesticks: ${candlesticks.length}`, 200, 35);
+            ctx.fillText(`Missiles: ${missiles.length}`, 380, 35);
              
              // Pattern and height (second row)
              ctx.fillStyle = patternDirection === 'bullish' ? '#4CAF50' : '#F44336';
@@ -1488,9 +2310,190 @@
                      scorePopup = null; // Remove popup after animation
                  }
              }
-         }
+                 }
         
-                 // Event listeners
+        // MetaMask Wallet Connection
+        let currentAccount = null;
+        let isWalletConnected = false;
+        
+        // Check if MetaMask is installed
+        function checkMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        // Connect to MetaMask
+        async function connectWallet() {
+            const connectBtn = document.getElementById('connect-wallet-btn');
+            const walletStatus = document.getElementById('wallet-status');
+            const statusText = walletStatus.querySelector('.status-text');
+            
+            if (!checkMetaMask()) {
+                // MetaMask not installed
+                walletStatus.className = 'wallet-status error';
+                statusText.textContent = 'MetaMask not installed!';
+                connectBtn.innerHTML = '<span class="wallet-icon">❌</span><span class="wallet-text">Install MetaMask</span>';
+                connectBtn.onclick = () => window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+            
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                if (accounts.length > 0) {
+                    currentAccount = accounts[0];
+                    isWalletConnected = true;
+                    
+                    // Update UI
+                    walletStatus.className = 'wallet-status connected';
+                    statusText.textContent = `Connected: ${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+                    connectBtn.innerHTML = '<span class="wallet-icon">✅</span><span class="wallet-text">Wallet Connected</span>';
+                    connectBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+                    connectBtn.style.borderColor = 'rgba(34, 197, 94, 0.6)';
+                    
+                    // Store connection state
+                    localStorage.setItem('pengpump_wallet_connected', 'true');
+                    localStorage.setItem('pengpump_wallet_address', currentAccount);
+                    
+                    console.log('Wallet connected successfully:', currentAccount);
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                walletStatus.className = 'wallet-status error';
+                statusText.textContent = 'Connection failed!';
+            }
+        }
+        
+        // Disconnect wallet
+        function disconnectWallet() {
+            currentAccount = null;
+            isWalletConnected = false;
+            
+            const connectBtn = document.getElementById('connect-wallet-btn');
+            const walletStatus = document.getElementById('wallet-status');
+            const statusText = walletStatus.querySelector('.status-text');
+            
+            // Reset UI
+            walletStatus.className = 'wallet-status';
+            statusText.textContent = 'Wallet not connected';
+            connectBtn.innerHTML = '<span class="wallet-icon">🦊</span><span class="wallet-text">Connect MetaMask</span>';
+            connectBtn.style.background = 'linear-gradient(135deg, #6366F1, #8B5CF6, #A855F7)';
+            connectBtn.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+            connectBtn.onclick = connectWallet;
+            
+            // Clear stored data
+            localStorage.removeItem('pengpump_wallet_connected');
+            localStorage.removeItem('pengpump_wallet_address');
+        }
+        
+        // Handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // User disconnected wallet
+                disconnectWallet();
+            } else if (accounts[0] !== currentAccount) {
+                // Account changed
+                currentAccount = accounts[0];
+                const walletStatus = document.getElementById('wallet-status');
+                const statusText = walletStatus.querySelector('.status-text');
+                statusText.textContent = `Connected: ${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+            }
+        }
+        
+        // Generate random wallet addresses for demo leaderboard
+        function generateRandomWallet() {
+            const chars = '0123456789abcdef';
+            let address = '0x';
+            for (let i = 0; i < 40; i++) {
+                address += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return address;
+        }
+        
+        // Generate demo leaderboard data
+        function generateDemoLeaderboard() {
+            const demoData = [
+                { rank: 1, wallet: '0x7a8b9c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b', score: 2230, time: '1:47' },
+                { rank: 2, wallet: '0x1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c', score: 1897, time: '2:12' },
+                { rank: 3, wallet: '0x9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d', score: 1564, time: '2:58' },
+                { rank: 4, wallet: '0x3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e', score: 1234, time: '3:45' },
+                { rank: 5, wallet: '0x5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f', score: 204, time: '4:12' }
+            ];
+            
+            return demoData;
+        }
+        
+        // Populate leaderboard table
+        function populateLeaderboard() {
+            console.log('🔄 populateLeaderboard() called');
+            
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            console.log('📊 leaderboardBody element:', leaderboardBody);
+            
+            if (!leaderboardBody) {
+                console.error('❌ leaderboard-body element not found!');
+                return;
+            }
+            
+            const demoData = generateDemoLeaderboard();
+            console.log('🎯 Demo data generated:', demoData);
+            
+            leaderboardBody.innerHTML = '';
+            
+            demoData.forEach(entry => {
+                const entryElement = document.createElement('div');
+                entryElement.className = `leaderboard-entry rank-${entry.rank <= 3 ? entry.rank : ''}`;
+                
+                entryElement.innerHTML = `
+                    <span class="rank-col">${entry.rank}</span>
+                    <span class="wallet-col" title="${entry.wallet}">${entry.wallet.slice(0, 8)}...${entry.wallet.slice(-6)}</span>
+                    <span class="score-col">${entry.score}</span>
+                    <span class="time-col">${entry.time}</span>
+                `;
+                
+                leaderboardBody.appendChild(entryElement);
+                console.log(`✅ Added entry ${entry.rank}: ${entry.score} points`);
+            });
+            
+            console.log('🎉 Leaderboard populated successfully!');
+        }
+        
+        // Initialize wallet connection on page load
+        function initWalletConnection() {
+            const connectBtn = document.getElementById('connect-wallet-btn');
+            const walletStatus = document.getElementById('wallet-status');
+            
+            // Add click event
+            connectBtn.addEventListener('click', connectWallet);
+            
+            // Check if wallet was previously connected
+            const wasConnected = localStorage.getItem('pengpump_wallet_connected');
+            const storedAddress = localStorage.getItem('pengpump_wallet_address');
+            
+            if (wasConnected && storedAddress && checkMetaMask()) {
+                // Auto-connect if previously connected
+                currentAccount = storedAddress;
+                isWalletConnected = true;
+                
+                walletStatus.className = 'wallet-status connected';
+                const statusText = walletStatus.querySelector('.status-text');
+                statusText.textContent = `Connected: ${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+                connectBtn.innerHTML = '<span class="wallet-icon">✅</span><span class="wallet-text">Wallet Connected</span>';
+                connectBtn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+                connectBtn.style.borderColor = 'rgba(34, 197, 94, 0.6)';
+            }
+            
+            // Listen for account changes
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+            }
+        }
+        
+        // Event listeners
          document.addEventListener('keydown', (e) => {
              // Handle restart with R key
              if (e.key.toLowerCase() === 'r' && gameOver) {
@@ -1617,13 +2620,14 @@
             }, 1000);
         });
 
-                 // Original interactions
+                 // Original interactions - Commented out as elements don't exist
+         /*
          document.querySelector('.title').addEventListener('click', () => {
              // Reset game
              restartGame();
          });
 
-                 document.querySelector('.more-details').addEventListener('click', () => {
+         document.querySelector('.more-details').addEventListener('click', () => {
              // Add multiple candlesticks quickly
              for (let i = 0; i < 5; i++) {
                  setTimeout(() => {
@@ -1638,7 +2642,7 @@
              }
          });
 
-                 document.querySelector('.view-works').addEventListener('click', () => {
+         document.querySelector('.view-works').addEventListener('click', () => {
              // Create a big bullish jump
              const lastCandlestick = candlesticks[candlesticks.length - 1];
              if (lastCandlestick) {
@@ -1648,8 +2652,10 @@
                  createCandlestick(newX, newY, newValue, 'bullish');
              }
          });
+         */
 
-        // Navigation buttons
+        // Navigation buttons - Commented out as elements don't exist in current HTML
+        /*
         document.querySelector('.back-button').addEventListener('click', () => {
             window.history.back();
         });
@@ -1666,10 +2672,10 @@
             document.querySelector('.settings-panel').style.display = 'block';
         });
 
-                 document.querySelector('.close-button').addEventListener('click', () => {
-             // Clear all candlesticks
-             restartGame();
-         });
+        document.querySelector('.close-button').addEventListener('click', () => {
+            // Clear all candlesticks
+            restartGame();
+        });
         
         // Minecraft demo button
         document.querySelector('.minecraft-button').addEventListener('click', () => {
@@ -1679,14 +2685,24 @@
         document.querySelector('.close-settings').addEventListener('click', () => {
             document.querySelector('.settings-panel').style.display = 'none';
         });
+        */
 
-        // Keyboard navigation
+        // Keyboard navigation - Commented out as settings-panel doesn't exist
+        /*
         document.addEventListener('keydown', (e) => {
             switch(e.key) {
                 case 'Escape':
                     document.querySelector('.settings-panel').style.display = 'none';
                     break;
             }
+        });
+        */
+        
+        // Initialize wallet connection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOMContentLoaded event fired');
+            initWalletConnection();
+            populateLeaderboard();
         });
     </script>
 </body>
